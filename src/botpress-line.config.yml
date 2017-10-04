@@ -1,0 +1,9 @@
+# Edit this file to set the LINE's module settings programmatically instead of using the GUI
+# This is regular YAML syntax. See http://docs.ansible.com/ansible/YAMLSyntax.html
+# You can override these settings with ENV variables. They are commented below.
+
+# channelId: "" # LINE_CHANNEL_ID
+# channelAccessToken: "" # LINE_CHANNEL_ACCESS_TOKEN
+# channelSecret: "" # LINE_CHANNEL_SECRET
+
+enabled: true
