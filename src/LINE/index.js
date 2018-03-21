@@ -4,6 +4,9 @@ import crypto from 'crypto'
 
 import * as URL from './urls'
 import { EVENT, MESSAGE, LINE_VERIFY } from './constants'
+import * as validator from './validator'
+
+const axios_1 = require("axios");
 
 export default class LINE extends EventEmitter {
   constructor(config) {
@@ -27,7 +30,7 @@ export default class LINE extends EventEmitter {
     this.verifyRequestSignature = this.verifyRequestSignature.bind(this)
 
     this.handleMessageEvent = this.handleMessageEvent.bind(this)
-    // this.handleAttachmentEvent = this.handleAttachmentEvent.bind(this)
+    this.handleAttachmentEvent = this.handleAttachmentEvent.bind(this)
     this.handleLocationEvent = this.handleLocationEvent.bind(this)
     this.handleFollowEvent = this.handleFollowEvent.bind(this)
     this.handleUnfollowEvent = this.handleUnfollowEvent.bind(this)
@@ -92,6 +95,8 @@ export default class LINE extends EventEmitter {
         }
       }
     ]
+
+    validator.validateTemplateButtons({ text, actions, ...options })
     return this.sendMessage(targetId, messageObj, otherOptions)
   }
 
@@ -107,6 +112,8 @@ export default class LINE extends EventEmitter {
         }
       }
     ]
+
+    validator.validateTemplateConfirm({ text, actions })
     return this.sendMessage(targetId, messageObj, options)
   }
 
@@ -121,6 +128,8 @@ export default class LINE extends EventEmitter {
         }
       }
     ]
+
+    validator.validateTemplateCarousel({type: MESSAGE.TEMPLATE.CAROUSEL, columns})
     return this.sendMessage(targetId, messageObj, options)
   }
 
@@ -135,6 +144,8 @@ export default class LINE extends EventEmitter {
         }
       }
     ]
+    
+    validator.validateTemplateCarousel({type: MESSAGE.TEMPLATE.IMAGE_CAROUSEL, columns})
     return this.sendMessage(targetId, messageObj, options)
   }
 
@@ -166,6 +177,17 @@ export default class LINE extends EventEmitter {
       )
   }
 
+  getMessageContent(messageId) {    
+    const url = URL.content(messageId)
+    var headers = this._authHeader();    
+    return fetch(url, { headers: this._authHeader()})      
+      .then(res => res.buffer())
+      .then(buffer => buffer)
+      .catch(err =>
+        console.log(`Error getting ${url}`)
+      )    
+  }
+
   verifyRequestSignature(req, res, buf) {
     if (!/^\/webhook/i.test(req.path)) {
       throw new Error('Path not allowed')
@@ -193,6 +215,16 @@ export default class LINE extends EventEmitter {
     }
     this._handleEvent(EVENT.MESSAGE, event)
   }
+
+  handleAttachmentEvent(event) {
+    const id = event.message.id
+    if (!id) {
+      return
+    }
+    //Este método sirve para imagenes, videos y sonidos
+    this._handleEvent(event.type, event)
+  }
+
   handleLocationEvent(event) {
     const type = event.type
     const { title, latitude, longitude } = event.message
@@ -248,6 +280,10 @@ export default class LINE extends EventEmitter {
   }
 
   _post(body) {
+    console.log('------------------POST-------');
+    console.log(JSON.stringify(body));
+    console.log('--------------FIN POST-------');
+    
     return fetch(URL.push, {
       method: 'POST',
       headers: {
@@ -286,7 +322,7 @@ export default class LINE extends EventEmitter {
     }
   }
 
-  _handleEvent(type, event) {
+  _handleEvent(type, event) {    
     this.emit(type, event, this.config.channelId)
   }
 

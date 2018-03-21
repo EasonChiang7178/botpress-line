@@ -1,7 +1,10 @@
 import LRU from 'lru-cache'
 
+
 import { getOrFetchUserProfile } from '../users'
-import { EVENT } from '../../LINE/constants'
+import { fetchContent } from '../content'
+import { EVENT,MESSAGE } from '../../LINE/constants'
+//const path = require('path');
 
 const messagesCache = LRU({
   max: 10000,
@@ -13,14 +16,32 @@ export default function setupEventHandler(bp, line) {
 
   line.on(EVENT.MESSAGE, (e, channelId) => {
     preprocessor(e).then(profile => {
-      bp.middlewares.sendIncoming({
-        platform: 'LINE',
-        channelId: channelId,
-        type: EVENT.MESSAGE,
-        user: profile,
-        text: e.message.text,
-        raw: e
-      })
+      var handleResponse = new Object();
+        handleResponse.platform =  'LINE';
+        handleResponse.channelId =  channelId;
+        handleResponse.type= EVENT.MESSAGE;
+        handleResponse.user= profile;
+        handleResponse.text= EVENT.MESSAGE;
+        handleResponse.raw= e;      
+      
+      switch (e.message.type) {    
+        case MESSAGE.TEXT:  
+             handleResponse.text= e.message.text;
+             console.log(handleResponse);
+             bp.middlewares.sendIncoming(handleResponse); //sendIncoming
+             break;
+        case MESSAGE.IMAGE:          
+          handleImage(e, bp, line).then(img=>{            
+              handleResponse.type= MESSAGE.IMAGE;
+              handleResponse.text= img;
+              console.log(handleResponse.type);
+              bp.middlewares.sendIncoming(handleResponse); //sendIncoming
+          }).catch(function(err){
+              console.log(err);
+          }); // handleImage  
+          break;
+        //TODO: Agregar handler para otros messag object
+        }
     })
   })
 
@@ -86,6 +107,7 @@ export default function setupEventHandler(bp, line) {
 }
 
 function preprocessEvent(bp, line, payload) {
+
   const userId = payload.source.userId
   const mid = payload.message && payload.message.id
 
@@ -96,3 +118,11 @@ function preprocessEvent(bp, line, payload) {
   }
   return getOrFetchUserProfile(bp, userId, line)
 }
+
+function handleImage(event, bp, line) {  
+  var tmp_img_dir = process.env.TEMP_IMG_DIR;
+  //const downloadPath = path.join(tmp_img_dir, `${message.id}.jpg`);  
+  const downloadPath = tmp_img_dir+'/'+`${event.message.id}.jpg`;  
+  return fetchContent(bp, event.message.id, line, downloadPath);
+}
+

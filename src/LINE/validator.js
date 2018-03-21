@@ -2,19 +2,19 @@ import { MESSAGE } from '../LINE/constants'
 
 export const validateUserId = userId => {
   if (!/U([0-9]|[a-z]){32}/.test(userId)) {
-    throw new Error('Invalid userId')
+    throw new Error('Invalid userId: '+userId);
   }
 }
 
 export const validateText = text => {
-  if (typeof text !== 'string' || text.length > 2000) {
+  if (text != "" && (typeof text !== 'string' || text.length > 2000)) {
     throw new Error('Text must be a string less than 2000 chars.')
   }
 }
 
 export const validateTemplateAltText = altText => {
-  if (typeof altText !== 'string' || altText.length > 400) {
-    throw new Error('altText must be a string less than 400 chars.')
+  if (altText != "" && (typeof altText !== 'string' || altText.length > 400)) {
+    throw new Error('altText must be a string less than 400 chars. ('+altText+')' )
   }
 }
 
@@ -77,20 +77,24 @@ export const validateTemplateConfirm = template => {
 }
 
 export const validateTemplateCarousel = template => {
-  if (
-    Array.isArray(template.columns) === false ||
-    template.columns.length > 5
-  ) {
-    throw new Error(
-      'columns of template carousel must be a array length less than 5'
-    )
-  }
-  if (template.type === MESSAGE.TEMPLATE.IMAGE_CAROUSEL) {
-    template.columns.forEach(column =>
-      validateTemplateImageCarouselCard(column)
-    )
-  } else {
-    template.columns.forEach(column => validateTemplateCarouselCard(column))
+  /*Puede ser que las columnas se definan dinámicamente, por lo que no
+  es válida en el momento del preprocessin del yml */
+  if (Array.isArray(template.columns) === true){
+    if(template.columns.length > 5){
+      throw new Error(
+        'columns of template carousel must be a array length less than 5'
+      )  
+    }else{
+      if (template.type === MESSAGE.TEMPLATE.IMAGE_CAROUSEL) {
+        template.columns.forEach(column =>
+          validateTemplateImageCarouselCard(column)
+        )
+      } else {
+        template.columns.forEach(column => validateTemplateCarouselCard(column))
+      }
+    }
+  }else{
+    console.warn('The columns are empty.');
   }
 }
 
@@ -138,7 +142,7 @@ export const validateTemplateImageCarouselCard = column => {
   validateTemplateAction(column.action, MESSAGE.TEMPLATE.IMAGE_CAROUSEL)
 }
 
-export const validateTemplateAction = (action, templateType) => {
+export const validateTemplateAction = (action, templateType) => {  
   _validateActionLabel(action.label, templateType)
   switch (action.type) {
   case 'postback':
@@ -171,12 +175,14 @@ export const validateTemplateAction = (action, templateType) => {
     }
   }
   function _validateUriAction(action) {
-    const uri = action.uri
-    if (typeof uri !== 'string' || uri.length > 1000) {
-      throw new Error('uri must be a string length less than 1000')
-    }
-    if (!/^(http|https|tel)/i.test(uri)) {
-      throw new Error('protocol of the uri action is not allowed')
+    const uri = action.uri;
+    if(uri != null && uri != ""){
+      if (typeof uri !== 'string' || uri.length > 1000) {
+        throw new Error('uri must be a string length less than 1000')
+      }
+      if (!/^(http|https|line|tel)/i.test(uri)) {
+        throw new Error('protocol of the uri action '+uri+' is not allowed!')
+      }
     }
   }
   function _validateDateTimePickerAction(action) {

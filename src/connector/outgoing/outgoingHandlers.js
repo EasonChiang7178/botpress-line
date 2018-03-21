@@ -9,7 +9,7 @@ const eventHandlerMapper = {
 }
 export default eventHandlerMapper
 
-function handleText(event, next, lines) {
+function handleText(event, next, lines) {  
   if (event.platform !== 'LINE' || event.type !== ACTION.TEXT) {
     return next()
   }
@@ -69,8 +69,7 @@ function handleTemplateCarousel(event, next, lines) {
   const to = event.raw.to
   const altText = event.raw.message.altText
   const columns = event.raw.message.template.columns
-  const raw = event.raw
-
+  const raw = event.raw  
   return _handlePromise(
     event,
     next,

@@ -49,7 +49,7 @@ function setupLINEWebhookListener(router, line, channelId) {
           event.message.type === MESSAGE.AUDIO ||
           event.message.type === MESSAGE.FILE)
       ) {
-        // line.handleAttachmentEvent(event)
+         line.handleAttachmentEvent(event)
       } else if (
         event.type === EVENT.MESSAGE &&
         event.message.type === MESSAGE.LOCATION
