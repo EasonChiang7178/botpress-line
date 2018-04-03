@@ -91,6 +91,8 @@ export const createTemplateCarousel = (
   channelId,
   altText,
   columns,
+  imageSize,
+  imageAspectRatio,
   options = {}
 ) => {
   validator.validateUserId(userId)
@@ -112,6 +114,8 @@ export const createTemplateCarousel = (
         altText,
         template: {
           type: MESSAGE.TEMPLATE.CAROUSEL,
+          imageSize: imageSize,
+          imageAspectRatio: imageAspectRatio,
           columns
         }
       }

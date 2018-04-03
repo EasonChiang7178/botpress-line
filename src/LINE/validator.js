@@ -78,7 +78,7 @@ export const validateTemplateConfirm = template => {
 
 export const validateTemplateCarousel = template => {
   /*Puede ser que las columnas se definan dinámicamente, por lo que no
-  es válida en el momento del preprocessin del yml */
+  es válida en el momento del preprocessing del yml */
   if (Array.isArray(template.columns) === true){
     if(template.columns.length > 5){
       throw new Error(

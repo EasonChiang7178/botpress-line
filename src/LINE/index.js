@@ -117,13 +117,15 @@ export default class LINE extends EventEmitter {
     return this.sendMessage(targetId, messageObj, options)
   }
 
-  sendCarouselMessage(targetId, altText, columns, options = null) {
+  sendCarouselMessage(targetId, altText, columns, imageSize, imageAspectRatio, options = null) {
     const messageObj = [
       {
         type: 'template',
         altText: altText,
         template: {
           type: MESSAGE.TEMPLATE.CAROUSEL,
+          imageAspectRatio:imageAspectRatio,
+          imageSize:imageSize,
           columns
         }
       }

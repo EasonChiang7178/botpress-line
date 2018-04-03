@@ -27,9 +27,8 @@ function processOutgoing({ event, blocName, instruction }) {
 
   /////////
   // Processing
-  /////////
-
-  if (!_.isNil(instruction.template_type)) {
+  /////////  
+  if (!_.isNil(instruction.template_type)) {        
     switch (instruction.template_type) {
     case MESSAGE.TEMPLATE.BUTTONS:
       return actions.createTemplateButtons(
@@ -55,6 +54,8 @@ function processOutgoing({ event, blocName, instruction }) {
         event.channelId,
         instruction.altText,
         instruction.columns,
+        instruction.imageSize,
+        instruction.imageAspectRatio,
         options
       )
     case MESSAGE.TEMPLATE.IMAGE_CAROUSEL:
@@ -168,6 +169,8 @@ function getTemplates() {
         '  - on: LINE\n' +
         '    template_type: carousel\n' +
         '    altText: AltText goes here...(1)\n' +
+        '    imageSize: cover\n' +
+        '    imageAspectRatio: rectangle\n' +        
         '    columns:\n' +
         '      - text: Card description goes here...(2)\n' +
         '        actions:\n' +

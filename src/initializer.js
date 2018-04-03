@@ -32,10 +32,7 @@ async function initializeLINE(bp, lines, config) {
     registerIncomingHooks(bp, line)
     bp.notifications.send({
       level: 'success',
-      message: `LINE webhook updated.\n\
-                 Remember to login ${chalk.green.bold.underline(
-    'https://developers.line.me/'
-  )} for verifying your LINE webhook`
+      message: 'LINE webhook updated.'
     })
   } catch (err) {
     bp.logger.error(err)

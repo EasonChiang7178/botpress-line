@@ -68,12 +68,14 @@ function handleTemplateCarousel(event, next, lines) {
 
   const to = event.raw.to
   const altText = event.raw.message.altText
+  const imageSize = event.raw.message.template.imageSize
+  const imageAspectRatio = event.raw.message.template.imageAspectRatio
   const columns = event.raw.message.template.columns
   const raw = event.raw  
   return _handlePromise(
     event,
     next,
-    lines[event.channelId].sendCarouselMessage(to, altText, columns, raw)
+    lines[event.channelId].sendCarouselMessage(to, altText, columns, imageSize, imageAspectRatio, raw)
   )
 }
 
